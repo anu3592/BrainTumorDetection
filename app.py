@@ -6,7 +6,6 @@ import cv2
 import urllib.request
 import os
 
-
 REPO_URL = 'https://raw.githubusercontent.com/anu3592/BrainTumorDetection/main/app.py'
 
 def main():
@@ -42,11 +41,12 @@ def application():
         st.success('Prediction: ' + predict(model, file_to_be_uploaded))
 
 def preprocess_image(image_path):
-    
-    img = cv2.imread(image_path)
 
+    img = cv2.imread(image_path)
     img = cv2.resize(img, (150, 150))
+
     img_array = np.array(img)
+
     img_array = img_array.reshape(1, 150, 150, 3)
     
     return img_array
@@ -55,18 +55,23 @@ def predict(model, image_file):
     temp_file_path = "temp_image.jpg"
     with open(temp_file_path, "wb") as f:
         f.write(image_file.getbuffer())
-        
+    
     preprocessed_image = preprocess_image(temp_file_path)
 
     predictions = model.predict(preprocessed_image)
 
     os.remove(temp_file_path)
+
     predicted_label = np.argmax(predictions[0]) + 1
-    
-    if predicted_label in [1, 2, 4]:
-        result = "Brain Tumor Detected"
+
+    if predicted_label == 1:
+        result = "Glioma Tumor"
+    elif predicted_label==2:
+        result = "Meningioma Tumor"
+    elif predicted_label==3:
+        result = "No Tumor"
     else:
-        result = "No Brain Tumor Detected"
+        result = "Pitutary Tumor"
     
     return result
 
